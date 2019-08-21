@@ -2,7 +2,6 @@ package putio
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -187,17 +186,13 @@ func (o *Object) ModTime(ctx context.Context) time.Time {
 //
 // Commits the datastore
 func (o *Object) SetModTime(ctx context.Context, modTime time.Time) error {
-	req, err := o.fs.client.NewRequest(ctx, "POST", "/v2/files/touch?file_id="+strconv.FormatInt(o.file.ID, 10)+"&updated_at="+modTime.Format(time.RFC3339), nil)
+	req, err := o.fs.client.NewRequest(ctx, "POST", "/v2/files/touch?file_id="+strconv.FormatInt(o.file.ID, 10)+"&updated_at="+url.QueryEscape(modTime.Format(time.RFC3339)), nil)
 	if err != nil {
 		return err
 	}
-	resp, err := o.fs.oAuthClient.Do(req)
+	_, err = o.fs.client.Do(req, nil)
 	if err != nil {
 		return err
-	}
-	_ = resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("touch: unexpected status code: %d", resp.StatusCode)
 	}
 	o.modtime = modTime
 	if o.file != nil {
