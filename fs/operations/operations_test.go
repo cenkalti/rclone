@@ -38,6 +38,7 @@ import (
 	_ "github.com/rclone/rclone/backend/all" // import all backends
 	"github.com/rclone/rclone/fs"
 	"github.com/rclone/rclone/fs/accounting"
+	"github.com/rclone/rclone/fs/cache"
 	"github.com/rclone/rclone/fs/filter"
 	"github.com/rclone/rclone/fs/fshttp"
 	"github.com/rclone/rclone/fs/hash"
@@ -853,6 +854,7 @@ func TestCopyFile(t *testing.T) {
 }
 
 func TestCopyFileBackupDir(t *testing.T) {
+	cache.Clear()
 	r := fstest.NewRun(t)
 	defer r.Finalise()
 	if !operations.CanServerSideMove(r.Fremote) {
